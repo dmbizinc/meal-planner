@@ -41,4 +41,49 @@ export default function Home() {
   };
 
   return (
-    <div style={{ fontFamily: 'sans-serif', background: '#f4f4f4', color: '#333
+    <div style={{ fontFamily: 'sans-serif', background: '#f4f4f4', color: '#333', paddingBottom: '40px' }}>
+      <header style={{ background: '#2ecc71', color: 'white', padding: '20px', textAlign: 'center' }}>
+        <h1>30-Day Healthy Meal Plan Generator</h1>
+        <p>Create a simple, nutritious plan with prep tips and images</p>
+      </header>
+
+      <div style={{ maxWidth: '900px', margin: 'auto', background: 'white', padding: '20px' }}>
+        <section style={{ marginBottom: '2em' }}>
+          <label>Choose a dietary plan:</label>
+          <select value={diet} onChange={e => setDiet(e.target.value)}>
+            <option value="omnivore">Omnivore</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+          </select>
+
+          <button onClick={generatePlan} style={{ marginLeft: '10px' }}>Generate Plan</button>
+        </section>
+
+        <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em' }}>
+          {mealPlan.map(meal => (
+            <div key={meal.day} style={{ border: '1px solid #ccc', padding: '1em', borderRadius: '8px', background: '#fafafa' }}>
+              <h3>Day {meal.day}</h3>
+              <img src={meal.img} alt={meal.name} style={{ width: '100%', borderRadius: '5px' }} />
+              <p><strong>Meal:</strong> {meal.name}</p>
+              <p><em>Prep:</em> Prep ingredients ahead for easy cooking.</p>
+            </div>
+          ))}
+        </section>
+
+        <section>
+          <h2>Meal Prep Tips</h2>
+          <ul>
+            <li>Batch cook grains and proteins on Sundays</li>
+            <li>Chop veggies ahead of time and store in containers</li>
+            <li>Use clear containers for easy meal visibility</li>
+            <li>Freeze extras for later in the month</li>
+          </ul>
+        </section>
+      </div>
+
+      <footer style={{ background: '#2ecc71', color: 'white', textAlign: 'center', padding: '1em 0' }}>
+        <p>&copy; 2025 HealthyMealsNow.com</p>
+      </footer>
+    </div>
+  );
+}
