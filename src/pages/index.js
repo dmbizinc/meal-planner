@@ -79,6 +79,7 @@ export default function Home() {
   const [dayIndex, setDayIndex] = useState(0);
   const [expandedMeal, setExpandedMeal] = useState(null);
   const [planGenerated, setPlanGenerated] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const meals = mealsByDiet[diet];
 
@@ -86,6 +87,7 @@ export default function Home() {
     setDayIndex(0);
     setExpandedMeal(null);
     setPlanGenerated(true);
+    setRefreshKey(prev => prev + 1);
   };
 
   const handleNext = () => {
@@ -96,6 +98,11 @@ export default function Home() {
   const handlePrev = () => {
     setExpandedMeal(null);
     setDayIndex((prev) => (prev - 1 + 7) % 7);
+  };
+
+  const handleRefresh = () => {
+    setExpandedMeal(null);
+    setRefreshKey(prev => prev + 1);
   };
 
   return (
@@ -121,10 +128,19 @@ export default function Home() {
 
           <button
             onClick={handleGenerate}
-            style={{ padding: '10px 20px', fontSize: '1em', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}
+            style={{ padding: '10px 20px', fontSize: '1em', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', marginLeft: '10px' }}
           >
             Create My Plan
           </button>
+
+          {planGenerated && (
+            <button
+              onClick={handleRefresh}
+              style={{ padding: '10px 20px', fontSize: '1em', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', marginLeft: '10px' }}
+            >
+              🔁 Refresh Options
+            </button>
+          )}
         </section>
 
         {planGenerated && (
@@ -135,7 +151,8 @@ export default function Home() {
               <button onClick={handleNext}>Next ➡️</button>
             </div>
             {['breakfast', 'lunch', 'dinner'].map(type => {
-              const meal = meals.find(m => m.type === type);
+              const options = meals.filter(m => m.type === type);
+              const meal = options[(dayIndex + refreshKey) % options.length];
               return (
                 <div key={type} onClick={() => setExpandedMeal(type === expandedMeal ? null : type)} style={{ cursor: 'pointer', margin: '1em auto', maxWidth: '600px', border: '1px solid #ccc', borderRadius: '8px', padding: '1em', background: '#fafafa' }}>
                   <h3 style={{ textTransform: 'capitalize' }}>{type}</h3>
