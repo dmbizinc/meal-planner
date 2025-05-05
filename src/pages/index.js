@@ -30,6 +30,7 @@ const meals = {
 export default function Home() {
   const [diet, setDiet] = useState('omnivore');
   const [mealPlan, setMealPlan] = useState([]);
+  const [planCreated, setPlanCreated] = useState(false);
 
   const generatePlan = () => {
     const selectedMeals = meals[diet];
@@ -38,6 +39,7 @@ export default function Home() {
       return { ...meal, day: i + 1 };
     });
     setMealPlan(plan);
+    setPlanCreated(true);
   };
 
   return (
@@ -49,36 +51,40 @@ export default function Home() {
 
       <div style={{ maxWidth: '900px', margin: 'auto', background: 'white', padding: '20px' }}>
         <section style={{ marginBottom: '2em' }}>
-          <label>Choose a dietary plan:</label>
-          <select value={diet} onChange={e => setDiet(e.target.value)}>
+          <label htmlFor="diet">Choose a dietary plan:</label>
+          <select id="diet" value={diet} onChange={e => setDiet(e.target.value)}>
             <option value="omnivore">Omnivore</option>
             <option value="vegetarian">Vegetarian</option>
             <option value="vegan">Vegan</option>
           </select>
 
-          <button onClick={generatePlan} style={{ marginLeft: '10px' }}>Generate Plan</button>
+          <button onClick={generatePlan} style={{ marginLeft: '10px' }}>Create My Plan</button>
         </section>
 
-        <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em' }}>
-          {mealPlan.map(meal => (
-            <div key={meal.day} style={{ border: '1px solid #ccc', padding: '1em', borderRadius: '8px', background: '#fafafa' }}>
-              <h3>Day {meal.day}</h3>
-              <img src={meal.img} alt={meal.name} style={{ width: '100%', borderRadius: '5px' }} />
-              <p><strong>Meal:</strong> {meal.name}</p>
-              <p><em>Prep:</em> Prep ingredients ahead for easy cooking.</p>
-            </div>
-          ))}
-        </section>
+        {planCreated && (
+          <>
+            <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em' }}>
+              {mealPlan.map(meal => (
+                <div key={meal.day} style={{ border: '1px solid #ccc', padding: '1em', borderRadius: '8px', background: '#fafafa' }}>
+                  <h3>Day {meal.day}</h3>
+                  <img src={meal.img} alt={meal.name} style={{ width: '100%', borderRadius: '5px' }} />
+                  <p><strong>Meal:</strong> {meal.name}</p>
+                  <p><em>Prep:</em> Prep ingredients ahead for easy cooking.</p>
+                </div>
+              ))}
+            </section>
 
-        <section>
-          <h2>Meal Prep Tips</h2>
-          <ul>
-            <li>Batch cook grains and proteins on Sundays</li>
-            <li>Chop veggies ahead of time and store in containers</li>
-            <li>Use clear containers for easy meal visibility</li>
-            <li>Freeze extras for later in the month</li>
-          </ul>
-        </section>
+            <section>
+              <h2>Meal Prep Tips</h2>
+              <ul>
+                <li>Batch cook grains and proteins on Sundays</li>
+                <li>Chop veggies ahead of time and store in containers</li>
+                <li>Use clear containers for easy meal visibility</li>
+                <li>Freeze extras for later in the month</li>
+              </ul>
+            </section>
+          </>
+        )}
       </div>
 
       <footer style={{ background: '#2ecc71', color: 'white', textAlign: 'center', padding: '1em 0' }}>
