@@ -1,86 +1,118 @@
 import { useState } from 'react';
 
-const meals = {
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+const mealsByDiet = {
   omnivore: [
     {
-      name: "Grilled Chicken Bowl",
-      img: "https://via.placeholder.com/300x200?text=Chicken+Bowl",
-      ingredients: ["1 chicken breast", "1 cup rice", "1/2 cup steamed broccoli"],
-      instructions: "Grill chicken, cook rice, steam broccoli. Assemble in bowl."
+      name: "Japanese Tamago Breakfast",
+      type: "breakfast",
+      img: "https://via.placeholder.com/300x200?text=Tamago+Breakfast",
+      ingredients: ["2 eggs", "1 tbsp soy sauce", "1 tsp sugar", "white rice"],
+      instructions: "Beat eggs with soy sauce and sugar. Cook in layers in a non-stick pan to form tamagoyaki. Serve with rice."
     },
     {
-      name: "Beef Stir Fry",
-      img: "https://via.placeholder.com/300x200?text=Beef+Stir+Fry",
-      ingredients: ["1/2 lb beef strips", "1 cup mixed vegetables", "2 tbsp soy sauce"],
-      instructions: "Stir fry beef and veggies in soy sauce over medium heat."
+      name: "Italian Chicken Panini",
+      type: "lunch",
+      img: "https://via.placeholder.com/300x200?text=Chicken+Panini",
+      ingredients: ["Grilled chicken", "ciabatta bread", "mozzarella", "basil pesto"],
+      instructions: "Assemble sandwich with chicken, mozzarella, and pesto. Grill until crispy and melted."
+    },
+    {
+      name: "Argentinian Steak with Chimichurri",
+      type: "dinner",
+      img: "https://via.placeholder.com/300x200?text=Steak+Chimichurri",
+      ingredients: ["1 ribeye steak", "chimichurri sauce", "roasted potatoes"],
+      instructions: "Grill steak to desired doneness. Top with chimichurri. Serve with potatoes."
     }
   ],
   vegetarian: [
     {
-      name: "Quinoa Veggie Bowl",
-      img: "https://via.placeholder.com/300x200?text=Quinoa+Veggies",
-      ingredients: ["1 cup cooked quinoa", "1/2 cup roasted veggies", "hummus"],
-      instructions: "Combine quinoa and veggies, top with hummus."
+      name: "Indian Masala Oats",
+      type: "breakfast",
+      img: "https://via.placeholder.com/300x200?text=Masala+Oats",
+      ingredients: ["1/2 cup oats", "vegetables", "garam masala", "water"],
+      instructions: "Cook vegetables with spices and oats. Simmer until thick and soft."
     },
     {
-      name: "Lentil Soup",
-      img: "https://via.placeholder.com/300x200?text=Lentil+Soup",
-      ingredients: ["1 cup lentils", "1 carrot", "1 celery stalk", "4 cups broth"],
-      instructions: "Simmer all ingredients for 30 minutes until tender."
+      name: "Greek Veggie Pita",
+      type: "lunch",
+      img: "https://via.placeholder.com/300x200?text=Veggie+Pita",
+      ingredients: ["Pita bread", "feta", "cucumber", "olives", "hummus"],
+      instructions: "Layer veggies, hummus and feta in pita. Serve cold or toasted."
+    },
+    {
+      name: "Mexican Vegetarian Enchiladas",
+      type: "dinner",
+      img: "https://via.placeholder.com/300x200?text=Veggie+Enchiladas",
+      ingredients: ["Tortillas", "black beans", "cheddar", "enchilada sauce"],
+      instructions: "Fill tortillas with beans and cheese, top with sauce, bake at 375°F for 25 mins."
     }
   ],
   vegan: [
     {
-      name: "Tofu & Rice Bowl",
-      img: "https://via.placeholder.com/300x200?text=Tofu+Rice",
-      ingredients: ["1/2 block tofu", "1 cup rice", "soy sauce"],
-      instructions: "Pan fry tofu, cook rice, combine and drizzle with soy sauce."
+      name: "Korean Tofu & Rice Bowl",
+      type: "breakfast",
+      img: "https://via.placeholder.com/300x200?text=Tofu+Rice+Korean",
+      ingredients: ["1/2 block tofu", "rice", "gochujang sauce", "scallions"],
+      instructions: "Pan-fry tofu, serve over rice, drizzle with gochujang, top with scallions."
     },
     {
-      name: "Chickpea Salad",
-      img: "https://via.placeholder.com/300x200?text=Chickpea+Salad",
-      ingredients: ["1 can chickpeas", "1/2 cucumber", "1/4 onion", "olive oil, lemon juice"],
-      instructions: "Mix all ingredients in a bowl and chill."
+      name: "Chinese Veggie Stir Fry",
+      type: "lunch",
+      img: "https://via.placeholder.com/300x200?text=Veggie+Stir+Fry",
+      ingredients: ["Mixed vegetables", "soy sauce", "garlic", "rice"],
+      instructions: "Stir fry veggies with garlic and soy. Serve with steamed rice."
+    },
+    {
+      name: "Spanish Chickpea Stew",
+      type: "dinner",
+      img: "https://via.placeholder.com/300x200?text=Chickpea+Stew",
+      ingredients: ["Chickpeas", "paprika", "onions", "peppers"],
+      instructions: "Simmer chickpeas with onions, garlic, paprika and peppers for 30 minutes."
     }
   ]
 };
 
 export default function Home() {
   const [diet, setDiet] = useState('omnivore');
-  const [mealPlan, setMealPlan] = useState([]);
-  const [planCreated, setPlanCreated] = useState(false);
-  const [expandedDay, setExpandedDay] = useState(null);
+  const [dayIndex, setDayIndex] = useState(0);
+  const [expandedMeal, setExpandedMeal] = useState(null);
+  const [planGenerated, setPlanGenerated] = useState(false);
 
-  const generatePlan = () => {
-    const selectedMeals = meals[diet];
-    const plan = Array.from({ length: 30 }, (_, i) => {
-      const meal = selectedMeals[Math.floor(Math.random() * selectedMeals.length)];
-      return { ...meal, day: i + 1 };
-    });
-    setMealPlan(plan);
-    setPlanCreated(true);
-    setExpandedDay(null);
+  const meals = mealsByDiet[diet];
+
+  const handleGenerate = () => {
+    setDayIndex(0);
+    setExpandedMeal(null);
+    setPlanGenerated(true);
   };
 
-  const toggleExpand = (day) => {
-    setExpandedDay(expandedDay === day ? null : day);
+  const handleNext = () => {
+    setExpandedMeal(null);
+    setDayIndex((prev) => (prev + 1) % 7);
+  };
+
+  const handlePrev = () => {
+    setExpandedMeal(null);
+    setDayIndex((prev) => (prev - 1 + 7) % 7);
   };
 
   return (
-    <div style={{ fontFamily: 'sans-serif', background: '#f4f4f4', color: '#333', paddingBottom: '40px' }}>
+    <div style={{ fontFamily: 'sans-serif', background: '#f4f4f4', minHeight: '100vh', color: '#333', paddingBottom: '40px' }}>
       <header style={{ background: '#2ecc71', color: 'white', padding: '20px', textAlign: 'center' }}>
-        <h1>30-Day Healthy Meal Plan Generator</h1>
-        <p>Create a simple, nutritious plan with prep tips and images</p>
+        <h1>Weekly Global Meal Planner</h1>
+        <p>Explore 7 days of meals from around the world</p>
       </header>
 
       <div style={{ maxWidth: '900px', margin: 'auto', background: 'white', padding: '20px' }}>
         <section style={{ marginBottom: '2em', textAlign: 'center' }}>
-          <label htmlFor="diet" style={{ marginRight: '10px', fontSize: '1.2em' }}>Choose a dietary plan:</label>
+          <label htmlFor="diet" style={{ fontSize: '1.2em' }}>Choose a dietary plan:</label>
           <select
             id="diet"
             value={diet}
             onChange={e => setDiet(e.target.value)}
-            style={{ padding: '8px 12px', fontSize: '1em', borderRadius: '4px', border: '1px solid #ccc' }}
+            style={{ margin: '0 10px', padding: '8px', fontSize: '1em', borderRadius: '4px' }}
           >
             <option value="omnivore">Omnivore</option>
             <option value="vegetarian">Vegetarian</option>
@@ -88,52 +120,39 @@ export default function Home() {
           </select>
 
           <button
-            onClick={generatePlan}
-            style={{ marginLeft: '15px', padding: '10px 20px', fontSize: '1em', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            onMouseOver={e => e.target.style.backgroundColor = '#27ae60'}
-            onMouseOut={e => e.target.style.backgroundColor = '#2ecc71'}
+            onClick={handleGenerate}
+            style={{ padding: '10px 20px', fontSize: '1em', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}
           >
             Create My Plan
           </button>
         </section>
 
-        {planCreated && (
-          <>
-            <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1em' }}>
-              {mealPlan.map(meal => (
-                <div
-                  key={meal.day}
-                  style={{ border: '1px solid #ccc', padding: '1em', borderRadius: '8px', background: '#fafafa', cursor: 'pointer' }}
-                  onClick={() => toggleExpand(meal.day)}
-                >
-                  <h3>Day {meal.day}</h3>
-                  <img src={meal.img} alt={meal.name} style={{ width: '100%', borderRadius: '5px' }} />
-                  <p><strong>Meal:</strong> {meal.name}</p>
-                  <p><em>Prep:</em> Prep ingredients ahead for easy cooking.</p>
-                  {expandedDay === meal.day && (
-                    <div style={{ marginTop: '1em' }}>
+        {planGenerated && (
+          <section style={{ textAlign: 'center' }}>
+            <h2>{days[dayIndex]}</h2>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1em', marginBottom: '1em' }}>
+              <button onClick={handlePrev}>⬅️ Previous</button>
+              <button onClick={handleNext}>Next ➡️</button>
+            </div>
+            {['breakfast', 'lunch', 'dinner'].map(type => {
+              const meal = meals.find(m => m.type === type);
+              return (
+                <div key={type} onClick={() => setExpandedMeal(type === expandedMeal ? null : type)} style={{ cursor: 'pointer', margin: '1em auto', maxWidth: '600px', border: '1px solid #ccc', borderRadius: '8px', padding: '1em', background: '#fafafa' }}>
+                  <h3 style={{ textTransform: 'capitalize' }}>{type}</h3>
+                  <img src={meal.img} alt={meal.name} style={{ width: '100%', borderRadius: '6px' }} />
+                  <p><strong>{meal.name}</strong></p>
+                  {expandedMeal === type && (
+                    <div style={{ textAlign: 'left' }}>
                       <h4>Ingredients</h4>
-                      <ul>
-                        {meal.ingredients.map((item, idx) => <li key={idx}>{item}</li>)}
-                      </ul>
+                      <ul>{meal.ingredients.map((item, i) => <li key={i}>{item}</li>)}</ul>
                       <h4>Instructions</h4>
                       <p>{meal.instructions}</p>
                     </div>
                   )}
                 </div>
-              ))}
-            </section>
-
-            <section>
-              <h2>Meal Prep Tips</h2>
-              <ul>
-                <li>Batch cook grains and proteins on Sundays</li>
-                <li>Chop veggies ahead of time and store in containers</li>
-                <li>Use clear containers for easy meal visibility</li>
-                <li>Freeze extras for later in the month</li>
-              </ul>
-            </section>
-          </>
+              );
+            })}
+          </section>
         )}
       </div>
 
@@ -143,4 +162,3 @@ export default function Home() {
     </div>
   );
 }
-
