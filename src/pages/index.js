@@ -76,5 +76,105 @@ const mealsByDiet = {
 };
 
 export default function Home() {
-  // [Component logic remains unchanged...]
+  const [diet, setDiet] = useState('omnivore');
+  const [dayIndex, setDayIndex] = useState(0);
+  const [expandedMeal, setExpandedMeal] = useState(null);
+  const [planGenerated, setPlanGenerated] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleGenerate = () => {
+    setDayIndex(0);
+    setExpandedMeal(null);
+    setPlanGenerated(true);
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const handleNext = () => {
+    setExpandedMeal(null);
+    setDayIndex((prev) => (prev + 1) % 7);
+  };
+
+  const handlePrev = () => {
+    setExpandedMeal(null);
+    setDayIndex((prev) => (prev - 1 + 7) % 7);
+  };
+
+  const handleRefresh = () => {
+    setExpandedMeal(null);
+    setRefreshKey(prev => prev + 1);
+  };
+
+  return (
+    <div style={{ fontFamily: 'sans-serif', background: '#f4f4f4', minHeight: '100vh', color: '#333', paddingBottom: '40px' }}>
+      <header style={{ background: '#2ecc71', color: 'white', padding: '20px', textAlign: 'center' }}>
+        <h1>Weekly Global Meal Planner</h1>
+        <p>Explore 7 days of meals from around the world</p>
+      </header>
+
+      <div style={{ maxWidth: '900px', margin: 'auto', background: 'white', padding: '20px' }}>
+        <section style={{ marginBottom: '2em', textAlign: 'center' }}>
+          <label htmlFor="diet" style={{ fontSize: '1.2em' }}>Choose a dietary plan:</label>
+          <select
+            id="diet"
+            value={diet}
+            onChange={e => setDiet(e.target.value)}
+            style={{ margin: '0 10px', padding: '8px', fontSize: '1em', borderRadius: '4px' }}
+          >
+            <option value="omnivore">Omnivore</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+          </select>
+
+          <button
+            onClick={handleGenerate}
+            style={{ padding: '10px 20px', fontSize: '1em', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', marginLeft: '10px' }}
+          >
+            Create My Plan
+          </button>
+
+          {planGenerated && (
+            <button
+              onClick={handleRefresh}
+              style={{ padding: '10px 20px', fontSize: '1em', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', marginLeft: '10px' }}
+            >
+              🔁 Refresh Options
+            </button>
+          )}
+        </section>
+
+        {planGenerated && (
+          <section style={{ textAlign: 'center' }}>
+            <h2>{days[dayIndex]}</h2>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1em', marginBottom: '1em' }}>
+              <button onClick={handlePrev}>⬅️ Previous</button>
+              <button onClick={handleNext}>Next ➡️</button>
+            </div>
+            {['breakfast', 'lunch', 'dinner'].map(type => {
+              const options = mealsByDiet[diet].filter(m => m.type === type);
+              const meal = options[(dayIndex + refreshKey) % options.length];
+              return (
+                <div key={type} onClick={() => setExpandedMeal(type === expandedMeal ? null : type)} style={{ cursor: 'pointer', margin: '1em auto', maxWidth: '600px', border: '1px solid #ccc', borderRadius: '8px', padding: '1em', background: '#fafafa' }}>
+                  <h3 style={{ textTransform: 'capitalize' }}>{type}</h3>
+                  <img src={meal.img} alt={meal.name} style={{ width: '100%', borderRadius: '6px' }} />
+                  <p><strong>{meal.name}</strong></p>
+                  {expandedMeal === type && (
+                    <div style={{ textAlign: 'left' }}>
+                      <h4>Ingredients</h4>
+                      <ul>{meal.ingredients.map((item, i) => <li key={i}>{item}</li>)}</ul>
+                      <h4>Instructions</h4>
+                      <p style={{ whiteSpace: 'pre-wrap' }}>{meal.instructions}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </section>
+        )}
+      </div>
+
+      <footer style={{ background: '#2ecc71', color: 'white', textAlign: 'center', padding: '1em 0' }}>
+        <p>&copy; 2025 HealthyMealsNow.com</p>
+      </footer>
+    </div>
+  );
 }
