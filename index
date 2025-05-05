@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>30-Day Healthy Meal Plan</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 0; line-height: 1.6; background: #f4f4f4; color: #333; }
+    header, footer { background: #2ecc71; color: white; text-align: center; padding: 1em 0; }
+    .container { max-width: 900px; margin: auto; padding: 20px; background: white; }
+    .form-section { margin-bottom: 2em; }
+    .form-section label { display: block; margin-top: 10px; }
+    .meal-plan { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+    .meal-day { border: 1px solid #ccc; padding: 1em; border-radius: 8px; background: #fafafa; }
+    .meal-day h3 { margin-top: 0; }
+    .meal-day img { width: 100%; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>30-Day Healthy Meal Plan Generator</h1>
+    <p>Create a simple, nutritious plan with prep tips and images</p>
+  </header>
+
+  <div class="container">
+    <section class="form-section">
+      <label for="diet">Choose a dietary plan:</label>
+      <select id="diet">
+        <option value="omnivore">Omnivore</option>
+        <option value="vegetarian">Vegetarian</option>
+        <option value="vegan">Vegan</option>
+      </select>
+
+      <label for="calories">Calorie target:</label>
+      <select id="calories">
+        <option value="1200-1500">1200–1500</option>
+        <option value="1500-1800">1500–1800</option>
+        <option value="1800-2200">1800–2200</option>
+      </select>
+
+      <button onclick="generatePlan()">Generate Plan</button>
+    </section>
+
+    <section id="mealPlan" class="meal-plan"></section>
+
+    <section>
+      <h2>Meal Prep Tips</h2>
+      <ul>
+        <li>Batch cook grains and proteins on Sundays</li>
+        <li>Chop veggies ahead of time and store in containers</li>
+        <li>Use clear containers for easy meal visibility</li>
+        <li>Freeze extras for later in the month</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 HealthyMealsNow.com</p>
+  </footer>
+
+  <script>
+    const meals = {
+      omnivore: [
+        { name: "Grilled Chicken Bowl", img: "https://via.placeholder.com/300x200?text=Chicken+Bowl" },
+        { name: "Beef Stir Fry", img: "https://via.placeholder.com/300x200?text=Beef+Stir+Fry" },
+        { name: "Salmon & Veggies", img: "https://via.placeholder.com/300x200?text=Salmon+%26+Veggies" },
+        { name: "Turkey Meatballs & Quinoa", img: "https://via.placeholder.com/300x200?text=Turkey+Meatballs" },
+        { name: "Shrimp Tacos", img: "https://via.placeholder.com/300x200?text=Shrimp+Tacos" },
+        { name: "Chicken Fajita Bowl", img: "https://via.placeholder.com/300x200?text=Chicken+Fajita" }
+      ],
+      vegetarian: [
+        { name: "Quinoa Veggie Bowl", img: "https://via.placeholder.com/300x200?text=Quinoa+Veggies" },
+        { name: "Veggie Stir Fry", img: "https://via.placeholder.com/300x200?text=Veggie+Stir+Fry" },
+        { name: "Lentil Soup", img: "https://via.placeholder.com/300x200?text=Lentil+Soup" },
+        { name: "Stuffed Bell Peppers", img: "https://via.placeholder.com/300x200?text=Stuffed+Peppers" },
+        { name: "Vegetarian Chili", img: "https://via.placeholder.com/300x200?text=Veg+Chili" },
+        { name: "Zucchini Noodles", img: "https://via.placeholder.com/300x200?text=Zoodles" }
+      ],
+      vegan: [
+        { name: "Tofu & Rice Bowl", img: "https://via.placeholder.com/300x200?text=Tofu+Rice" },
+        { name: "Chickpea Salad", img: "https://via.placeholder.com/300x200?text=Chickpea+Salad" },
+        { name: "Vegan Pasta", img: "https://via.placeholder.com/300x200?text=Vegan+Pasta" },
+        { name: "Sweet Potato & Kale Bowl", img: "https://via.placeholder.com/300x200?text=Sweet+Potato+Kale" },
+        { name: "Black Bean Tacos", img: "https://via.placeholder.com/300x200?text=Bean+Tacos" },
+        { name: "Mushroom Stir Fry", img: "https://via.placeholder.com/300x200?text=Mushroom+Stir+Fry" }
+      ]
+    };
+
+    function generatePlan() {
+      const type = document.getElementById("diet").value;
+      const plan = document.getElementById("mealPlan");
+      plan.innerHTML = "";
+
+      for (let i = 1; i <= 30; i++) {
+        const meal = meals[type][Math.floor(Math.random() * meals[type].length)];
+        plan.innerHTML += `
+          <div class="meal-day">
+            <h3>Day ${i}</h3>
+            <img src="${meal.img}" alt="${meal.name}">
+            <p><strong>Meal:</strong> ${meal.name}</p>
+            <p><em>Prep:</em> Prep ingredients ahead for easy cooking.</p>
+          </div>`;
+      }
+    }
+  </script>
+</body>
+</html>
