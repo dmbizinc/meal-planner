@@ -50,15 +50,45 @@ export default function Home() {
       </header>
 
       <div style={{ maxWidth: '900px', margin: 'auto', background: 'white', padding: '20px' }}>
-        <section style={{ marginBottom: '2em' }}>
-          <label htmlFor="diet">Choose a dietary plan:</label>
-          <select id="diet" value={diet} onChange={e => setDiet(e.target.value)}>
+        <section style={{ marginBottom: '2em', textAlign: 'center' }}>
+          <label htmlFor="diet" style={{ marginRight: '10px', fontSize: '1.2em' }}>
+            Choose a dietary plan:
+          </label>
+          <select
+            id="diet"
+            value={diet}
+            onChange={e => setDiet(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              fontSize: '1em',
+              borderRadius: '4px',
+              border: '1px solid #ccc'
+            }}
+          >
             <option value="omnivore">Omnivore</option>
             <option value="vegetarian">Vegetarian</option>
             <option value="vegan">Vegan</option>
           </select>
 
-          <button onClick={generatePlan} style={{ marginLeft: '10px' }}>Create My Plan</button>
+          <button
+            onClick={generatePlan}
+            style={{
+              marginLeft: '15px',
+              padding: '10px 20px',
+              fontSize: '1em',
+              backgroundColor: '#2ecc71',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              transition: 'background-color 0.3s'
+            }}
+            onMouseOver={e => (e.target.style.backgroundColor = '#27ae60')}
+            onMouseOut={e => (e.target.style.backgroundColor = '#2ecc71')}
+          >
+            Create My Plan
+          </button>
         </section>
 
         {planCreated && (
