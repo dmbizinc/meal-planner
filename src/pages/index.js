@@ -28,8 +28,7 @@ const allMeals = {
             "Fill tortillas with beef, roll, cover with sauce and cheese, and bake."
         }
       }
-    },
-    // Add more days here
+    }
   ],
   Vegetarian: [
     {
@@ -58,7 +57,6 @@ const allMeals = {
         }
       }
     }
-    // Add more days
   ],
   Vegan: [
     {
@@ -87,7 +85,6 @@ const allMeals = {
         }
       }
     }
-    // Add more days
   ]
 };
 
@@ -98,15 +95,19 @@ export default function Home() {
 
   useEffect(() => {
     generatePlan();
-  }, [selectedPlan]);
+  }, []);
 
   const generatePlan = () => {
-    setMealPlan(allMeals[selectedPlan]);
+    const plan = [...allMeals[selectedPlan]];
+    setMealPlan(plan);
     setCurrentDay(0);
   };
 
   const handlePlanChange = (e) => {
     setSelectedPlan(e.target.value);
+    const plan = [...allMeals[e.target.value]];
+    setMealPlan(plan);
+    setCurrentDay(0);
   };
 
   const renderDay = (day) => (
@@ -131,29 +132,38 @@ export default function Home() {
   );
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "Arial, sans-serif" }}>
-      <h1>Weekly Meal Planner</h1>
-      <label htmlFor="plan">Select Plan:</label>
-      <select id="plan" value={selectedPlan} onChange={handlePlanChange}>
-        <option value="Omnivore">Omnivore</option>
-        <option value="Vegetarian">Vegetarian</option>
-        <option value="Vegan">Vegan</option>
-      </select>
+    <div style={{ fontFamily: "Arial, sans-serif", textAlign: "center", backgroundColor: "#f9f9f9", paddingBottom: "3rem" }}>
+      <header style={{ backgroundColor: "#2ecc71", padding: "1rem", color: "white" }}>
+        <h1 style={{ margin: 0 }}>Healthy Weekly Meal Planner</h1>
+      </header>
 
-      <button onClick={() => generatePlan()} style={{ marginLeft: "1rem" }}>Refresh Options</button>
+      <div style={{ padding: "2rem" }}>
+        <label htmlFor="plan" style={{ fontWeight: "bold", marginRight: "1rem" }}>Select Plan:</label>
+        <select id="plan" value={selectedPlan} onChange={handlePlanChange}>
+          <option value="Omnivore">Omnivore</option>
+          <option value="Vegetarian">Vegetarian</option>
+          <option value="Vegan">Vegan</option>
+        </select>
 
-      <div style={{ marginTop: "2rem" }}>
-        {mealPlan.length > 0 && renderDay(mealPlan[currentDay])}
+        <button onClick={() => generatePlan()} style={{ marginLeft: "1rem", padding: "0.5rem 1rem", backgroundColor: "#3498db", color: "white", border: "none", borderRadius: "5px" }}>Refresh Options</button>
+
+        <div style={{ marginTop: "2rem" }}>
+          {mealPlan.length > 0 && renderDay(mealPlan[currentDay])}
+        </div>
+
+        <div style={{ marginTop: "2rem" }}>
+          <button onClick={() => setCurrentDay(Math.max(0, currentDay - 1))} disabled={currentDay === 0} style={{ marginRight: "1rem" }}>
+            Previous
+          </button>
+          <button onClick={() => setCurrentDay(Math.min(mealPlan.length - 1, currentDay + 1))} disabled={currentDay === mealPlan.length - 1}>
+            Next
+          </button>
+        </div>
       </div>
 
-      <div style={{ marginTop: "2rem" }}>
-        <button onClick={() => setCurrentDay(Math.max(0, currentDay - 1))} disabled={currentDay === 0}>
-          Previous
-        </button>
-        <button onClick={() => setCurrentDay(Math.min(mealPlan.length - 1, currentDay + 1))} disabled={currentDay === mealPlan.length - 1}>
-          Next
-        </button>
-      </div>
+      <footer style={{ backgroundColor: "#2ecc71", color: "white", padding: "1rem", position: "fixed", width: "100%", bottom: 0 }}>
+        © 2025 HealthyMealsNow.com
+      </footer>
     </div>
   );
 }
