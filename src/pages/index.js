@@ -1,168 +1,123 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import React, { useState } from 'react';
+import Image from 'next/image';
+import mealData from '@/sources/local/mealData';
 
-const allMeals = {
-  Omnivore: [
-    {
-      day: "Monday",
-      meals: {
-        Breakfast: {
-          name: "Japanese Tamago",
-          image: "/images/meals/tamago.jpg",
-          ingredients: ["Eggs", "Soy sauce", "Sugar", "Oil"],
-          instructions:
-            "Beat eggs with soy sauce and sugar. In a tamago pan, pour a thin layer, cook until set, roll to one side, then repeat layering and rolling to form layers."
-        },
-        Lunch: {
-          name: "Steak Bowl",
-          image: "/images/meals/steak.jpg",
-          ingredients: ["Steak", "Rice", "Broccoli", "Teriyaki sauce"],
-          instructions:
-            "Grill steak, steam broccoli, and serve over rice drizzled with teriyaki sauce."
-        },
-        Dinner: {
-          name: "Mexican Enchiladas",
-          image: "/images/meals/enchiladas.jpg",
-          ingredients: ["Tortillas", "Ground beef", "Cheese", "Enchilada sauce"],
-          instructions:
-            "Fill tortillas with beef, roll, cover with sauce and cheese, and bake."
-        }
-      }
-    }
-  ],
-  Vegetarian: [
-    {
-      day: "Monday",
-      meals: {
-        Breakfast: {
-          name: "Masala Oats",
-          image: "/images/meals/masala_oats.jpg",
-          ingredients: ["Oats", "Carrot", "Peas", "Spices"],
-          instructions:
-            "Sauté veggies with spices, then add oats and water to cook into a savory porridge."
-        },
-        Lunch: {
-          name: "Veggie Pita",
-          image: "/images/meals/veggie_pita.jpg",
-          ingredients: ["Pita bread", "Hummus", "Tomato", "Cucumber", "Lettuce"],
-          instructions:
-            "Spread hummus in pita and fill with chopped fresh veggies."
-        },
-        Dinner: {
-          name: "Chickpea Stew",
-          image: "/images/meals/chickpea_stew.jpg",
-          ingredients: ["Chickpeas", "Tomatoes", "Carrots", "Spices"],
-          instructions:
-            "Simmer all ingredients until soft and stew-like."
-        }
-      }
-    }
-  ],
-  Vegan: [
-    {
-      day: "Monday",
-      meals: {
-        Breakfast: {
-          name: "Tofu Bibimbap",
-          image: "/images/meals/tofu_bibimbap.jpg",
-          ingredients: ["Tofu", "Spinach", "Carrots", "Rice", "Gochujang"],
-          instructions:
-            "Pan-fry tofu and serve with veggies over rice, drizzle with gochujang sauce."
-        },
-        Lunch: {
-          name: "Veggie Stir Fry",
-          image: "/images/meals/stir_fry.jpg",
-          ingredients: ["Mixed vegetables", "Soy sauce", "Rice"],
-          instructions:
-            "Sauté veggies in soy sauce and serve over steamed rice."
-        },
-        Dinner: {
-          name: "Grilled Veg Panini",
-          image: "/images/meals/panini.jpg",
-          ingredients: ["Bread", "Zucchini", "Peppers", "Vegan cheese"],
-          instructions:
-            "Grill veggies, layer on bread with vegan cheese, and press into a panini."
-        }
-      }
-    }
-  ]
-};
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export default function Home() {
-  const [selectedPlan, setSelectedPlan] = useState("Omnivore");
-  const [mealPlan, setMealPlan] = useState([]);
-  const [currentDay, setCurrentDay] = useState(0);
+  const [plan, setPlan] = useState('Omnivore');
+  const [dayIndex, setDayIndex] = useState(0);
+  const [meals, setMeals] = useState(generateMeals(plan));
 
-  useEffect(() => {
-    generatePlan();
-  }, []);
+  function generateMeals(planType) {
+    const planMeals = mealData[planType];
+    return days.map(day => {
+      const dayMeals = {};
+      ['breakfast', 'lunch', 'dinner'].forEach(type => {
+        const options = planMeals[type];
+        const randomMeal = options[Math.floor(Math.random() * options.length)];
+        dayMeals[type] = randomMeal;
+      });
+      return { day, ...dayMeals };
+    });
+  }
 
-  const generatePlan = () => {
-    const plan = [...allMeals[selectedPlan]];
-    setMealPlan(plan);
-    setCurrentDay(0);
+  function refreshMeals() {
+    setMeals(generateMeals(plan));
+  }
+
+  const handlePlanChange = e => {
+    const selectedPlan = e.target.value;
+    setPlan(selectedPlan);
+    setMeals(generateMeals(selectedPlan));
   };
 
-  const handlePlanChange = (e) => {
-    setSelectedPlan(e.target.value);
-    const plan = [...allMeals[e.target.value]];
-    setMealPlan(plan);
-    setCurrentDay(0);
+  const nextDay = () => {
+    setDayIndex((dayIndex + 1) % days.length);
   };
 
-  const renderDay = (day) => (
-    <div key={day.day} className="day-card">
-      <h2>{day.day}</h2>
-      {Object.entries(day.meals).map(([mealType, meal]) => (
-        <div key={mealType} className="meal-block">
-          <h3>{mealType}</h3>
-          <p><strong>{meal.name}</strong></p>
-          <Image
-            src={meal.image}
-            alt={meal.name}
-            width={300}
-            height={200}
-            style={{ borderRadius: "10px" }}
-          />
-          <p><strong>Ingredients:</strong> {meal.ingredients.join(", ")}</p>
-          <p><strong>Instructions:</strong> {meal.instructions}</p>
-        </div>
-      ))}
-    </div>
-  );
+  const prevDay = () => {
+    setDayIndex((dayIndex - 1 + days.length) % days.length);
+  };
+
+  const currentDay = meals[dayIndex];
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", textAlign: "center", backgroundColor: "#f9f9f9", paddingBottom: "3rem" }}>
-      <header style={{ backgroundColor: "#2ecc71", padding: "1rem", color: "white" }}>
-        <h1 style={{ margin: 0 }}>Healthy Weekly Meal Planner</h1>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center">
+      <header className="w-full bg-green-500 py-4 text-white text-center font-bold text-xl shadow">
+        Healthy 7-Day Meal Planner
       </header>
 
-      <div style={{ padding: "2rem" }}>
-        <label htmlFor="plan" style={{ fontWeight: "bold", marginRight: "1rem" }}>Select Plan:</label>
-        <select id="plan" value={selectedPlan} onChange={handlePlanChange}>
-          <option value="Omnivore">Omnivore</option>
-          <option value="Vegetarian">Vegetarian</option>
-          <option value="Vegan">Vegan</option>
-        </select>
+      <div className="flex flex-col items-center my-4 gap-2">
+        <div className="flex flex-col md:flex-row items-center gap-3">
+          <label htmlFor="plan" className="font-semibold">Select Plan:</label>
+          <select
+            id="plan"
+            value={plan}
+            onChange={handlePlanChange}
+            className="px-3 py-1 border rounded shadow"
+          >
+            <option value="Omnivore">Omnivore</option>
+            <option value="Vegetarian">Vegetarian</option>
+            <option value="Vegan">Vegan</option>
+          </select>
 
-        <button onClick={() => generatePlan()} style={{ marginLeft: "1rem", padding: "0.5rem 1rem", backgroundColor: "#3498db", color: "white", border: "none", borderRadius: "5px" }}>Refresh Options</button>
-
-        <div style={{ marginTop: "2rem" }}>
-          {mealPlan.length > 0 && renderDay(mealPlan[currentDay])}
+          <button
+            onClick={refreshMeals}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow"
+          >
+            Refresh Options
+          </button>
         </div>
 
-        <div style={{ marginTop: "2rem" }}>
-          <button onClick={() => setCurrentDay(Math.max(0, currentDay - 1))} disabled={currentDay === 0} style={{ marginRight: "1rem" }}>
-            Previous
-          </button>
-          <button onClick={() => setCurrentDay(Math.min(mealPlan.length - 1, currentDay + 1))} disabled={currentDay === mealPlan.length - 1}>
-            Next
-          </button>
+        <div className="text-center mt-4">
+          <h2 className="text-3xl font-semibold">{currentDay.day}</h2>
         </div>
       </div>
 
-      <footer style={{ backgroundColor: "#2ecc71", color: "white", padding: "1rem", position: "fixed", width: "100%", bottom: 0 }}>
-        © 2025 HealthyMealsNow.com
+      <div className="w-full max-w-4xl flex flex-col gap-6 px-4 mb-6">
+        {['breakfast', 'lunch', 'dinner'].map(mealType => {
+          const meal = currentDay[mealType];
+          return (
+            <div key={mealType} className="bg-white rounded-xl shadow p-6">
+              <h3 className="text-2xl font-semibold text-center mb-2 capitalize">{mealType}</h3>
+              <p className="text-center text-xl font-bold mb-2">{meal.name}</p>
+              <div className="flex flex-col items-center">
+                <div className="mb-4">
+                  <img
+                    src={`/images/meals/${meal.image}`}
+                    alt={meal.name}
+                    className="rounded-lg shadow-md max-w-xs mx-auto"
+                    style={{ maxHeight: '250px' }}
+                  />
+                </div>
+                <div className="text-left w-full md:w-3/4">
+                  <p><span className="font-semibold">Ingredients:</span> {meal.ingredients.join(', ')}</p>
+                  <p><span className="font-semibold">Instructions:</span> {meal.instructions}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex justify-between items-center w-full max-w-xs mb-8">
+        <button
+          onClick={prevDay}
+          className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+        >
+          Previous
+        </button>
+        <button
+          onClick={nextDay}
+          className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+        >
+          Next
+        </button>
+      </div>
+
+      <footer className="w-full bg-green-500 py-2 text-center text-white">
+        &copy; 2025 HealthyMealsNow.com
       </footer>
     </div>
   );
