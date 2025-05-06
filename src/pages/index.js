@@ -96,13 +96,12 @@ export default function Home() {
   }
 
   return (
-    <div style={{ fontFamily: 'sans-serif', padding: 20 }}>
+    <div style={{ fontFamily: 'sans-serif', padding: 20, maxWidth: 900, margin: 'auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
         <label>
           Choose a dietary plan:{' '}
           <select value={diet} onChange={(e) => { setDiet(e.target.value); setDayMeals(generateRandomMeals(e.target.value)); }}>
             <option value="Omnivore">Omnivore</option>
-            {/* Add Vegetarian, Vegan etc as needed */}
           </select>
         </label>
         <button onClick={refreshMeals} style={{ backgroundColor: '#28c76f', color: 'white', border: 'none', padding: '10px 20px', borderRadius: 6 }}>
