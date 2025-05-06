@@ -1,123 +1,103 @@
-import React, { useState } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 import mealData from '../../sources/local/mealData';
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
 export default function Home() {
-  const [plan, setPlan] = useState('Omnivore');
+  const [selectedPlan, setSelectedPlan] = useState('Omnivore');
   const [dayIndex, setDayIndex] = useState(0);
-  const [meals, setMeals] = useState(generateMeals(plan));
+  const [weekMeals, setWeekMeals] = useState(generateWeeklyMeals(selectedPlan));
 
-  function generateMeals(planType) {
-    const planMeals = mealData[planType];
-    return days.map(day => {
-      const dayMeals = {};
-      ['breakfast', 'lunch', 'dinner'].forEach(type => {
-        const options = planMeals[type];
-        const randomMeal = options[Math.floor(Math.random() * options.length)];
-        dayMeals[type] = randomMeal;
+  function generateWeeklyMeals(plan) {
+    const planMeals = mealData[plan.toLowerCase()] || [];
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    return days.map(() => {
+      return ['breakfast', 'lunch', 'dinner'].map(mealType => {
+        const options = planMeals.filter(m => m.type === mealType);
+        return options[Math.floor(Math.random() * options.length)];
       });
-      return { day, ...dayMeals };
     });
   }
 
-  function refreshMeals() {
-    setMeals(generateMeals(plan));
+  function handlePlanChange(e) {
+    const newPlan = e.target.value;
+    setSelectedPlan(newPlan);
+    setWeekMeals(generateWeeklyMeals(newPlan));
+    setDayIndex(0);
   }
 
-  const handlePlanChange = e => {
-    const selectedPlan = e.target.value;
-    setPlan(selectedPlan);
-    setMeals(generateMeals(selectedPlan));
-  };
+  function refreshMeals() {
+    setWeekMeals(generateWeeklyMeals(selectedPlan));
+  }
 
-  const nextDay = () => {
-    setDayIndex((dayIndex + 1) % days.length);
-  };
-
-  const prevDay = () => {
-    setDayIndex((dayIndex - 1 + days.length) % days.length);
-  };
-
-  const currentDay = meals[dayIndex];
+  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center">
-      <header className="w-full bg-green-500 py-4 text-white text-center font-bold text-xl shadow">
-        Healthy 7-Day Meal Planner
+    <div className="min-h-screen bg-gray-50 text-center">
+      <header className="bg-green-500 text-white p-4">
+        <h1 className="text-3xl font-bold">Healthy Weekly Meal Planner</h1>
       </header>
 
-      <div className="flex flex-col items-center my-4 gap-2">
-        <div className="flex flex-col md:flex-row items-center gap-3">
-          <label htmlFor="plan" className="font-semibold">Select Plan:</label>
-          <select
-            id="plan"
-            value={plan}
-            onChange={handlePlanChange}
-            className="px-3 py-1 border rounded shadow"
-          >
-            <option value="Omnivore">Omnivore</option>
-            <option value="Vegetarian">Vegetarian</option>
-            <option value="Vegan">Vegan</option>
-          </select>
-
-          <button
-            onClick={refreshMeals}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow"
-          >
-            Refresh Options
-          </button>
-        </div>
-
-        <div className="text-center mt-4">
-          <h2 className="text-3xl font-semibold">{currentDay.day}</h2>
-        </div>
+      <div className="flex justify-center items-center gap-4 mt-6">
+        <label className="font-semibold">Select Plan:</label>
+        <select value={selectedPlan} onChange={handlePlanChange} className="p-2 border rounded">
+          <option value="Omnivore">Omnivore</option>
+          <option value="Vegetarian">Vegetarian</option>
+          <option value="Vegan">Vegan</option>
+        </select>
+        <button
+          onClick={refreshMeals}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Refresh Options
+        </button>
       </div>
 
-      <div className="w-full max-w-4xl flex flex-col gap-6 px-4 mb-6">
-        {['breakfast', 'lunch', 'dinner'].map(mealType => {
-          const meal = currentDay[mealType];
+      <div className="mt-10">
+        <h2 className="text-3xl font-bold">{daysOfWeek[dayIndex]}</h2>
+        {['Breakfast', 'Lunch', 'Dinner'].map((mealName, i) => {
+          const meal = weekMeals[dayIndex]?.[i];
           return (
-            <div key={mealType} className="bg-white rounded-xl shadow p-6">
-              <h3 className="text-2xl font-semibold text-center mb-2 capitalize">{mealType}</h3>
-              <p className="text-center text-xl font-bold mb-2">{meal.name}</p>
-              <div className="flex flex-col items-center">
-                <div className="mb-4">
-                  <img
-                    src={`/images/meals/${meal.image}`}
-                    alt={meal.name}
-                    className="rounded-lg shadow-md max-w-xs mx-auto"
-                    style={{ maxHeight: '250px' }}
-                  />
-                </div>
-                <div className="text-left w-full md:w-3/4">
-                  <p><span className="font-semibold">Ingredients:</span> {meal.ingredients.join(', ')}</p>
-                  <p><span className="font-semibold">Instructions:</span> {meal.instructions}</p>
-                </div>
-              </div>
+            <div key={i} className="max-w-md mx-auto bg-white rounded shadow my-4 p-4">
+              <h3 className="text-xl font-semibold">{mealName}</h3>
+              <p className="text-lg font-medium">{meal?.name}</p>
+              {meal?.image && (
+                <img
+                  src={`/images/meals/${meal.image}`}
+                  alt={meal.name}
+                  className="w-full h-auto mt-2 rounded"
+                />
+              )}
+              {meal?.ingredients?.length > 0 && (
+                <p className="mt-2">
+                  <span className="font-semibold">Ingredients:</span> {meal.ingredients.join(', ')}
+                </p>
+              )}
+              {meal?.instructions && (
+                <p>
+                  <span className="font-semibold">Instructions:</span> {meal.instructions}
+                </p>
+              )}
             </div>
           );
         })}
       </div>
 
-      <div className="flex justify-between items-center w-full max-w-xs mb-8">
+      <div className="flex justify-center gap-4 mt-6">
         <button
-          onClick={prevDay}
-          className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+          onClick={() => setDayIndex((dayIndex + 6) % 7)}
+          className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
         >
           Previous
         </button>
         <button
-          onClick={nextDay}
-          className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+          onClick={() => setDayIndex((dayIndex + 1) % 7)}
+          className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
         >
           Next
         </button>
       </div>
 
-      <footer className="w-full bg-green-500 py-2 text-center text-white">
-        &copy; 2025 HealthyMealsNow.com
+      <footer className="bg-green-500 text-white p-4 mt-10">
+        <p>© {new Date().getFullYear()} HealthyMealsNow.com</p>
       </footer>
     </div>
   );
